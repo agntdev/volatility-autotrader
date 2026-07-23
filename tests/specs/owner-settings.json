@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Owner settings menu shows defaults",
+    "steps": [
+      {
+        "send": { "callback": "owner:menu" },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Owner controls\n\nInstruments: Volatility 50, Volatility 75\nConfidence threshold: 70%\nDefault risk: 1%\nDefault max concurrent: 1\nDefault TP multiplier: 2×\nDefault SL fraction: 50% of stake\nManual overrides: on\nMin balance alert: 5"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Owner toggles V75 off",
+    "steps": [
+      {
+        "send": { "callback": "owner:menu" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "owner:toggle:R_75" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Owner controls\n\nInstruments: Volatility 50\nConfidence threshold: 70%\nDefault risk: 1%\nDefault max concurrent: 1\nDefault TP multiplier: 2×\nDefault SL fraction: 50% of stake\nManual overrides: on\nMin balance alert: 5"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

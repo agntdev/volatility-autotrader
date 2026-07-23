@@ -1,19 +1,34 @@
 [
   {
-    "name": "/history",
+    "name": "/history empty state invites next step",
     "steps": [
       {
+        "send": { "text": "/history" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Show last 10 executed trades with performance metrics"
+              "text": "No trades yet — enable autotrading or run a scan to open one."
             }
           }
-        ],
-        "send": {
-          "text": "/history"
-        }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "History menu button shows empty state",
+    "steps": [
+      {
+        "send": { "callback": "history:show" },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "No trades yet — enable autotrading or run a scan to open one."
+            }
+          }
+        ]
       }
     ]
   }

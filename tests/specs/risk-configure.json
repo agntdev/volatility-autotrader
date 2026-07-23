@@ -1,19 +1,93 @@
 [
   {
-    "name": "Adjust Risk Settings",
+    "name": "Adjust Risk Settings shows profile after terms",
     "steps": [
       {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "risk:configure" },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Risk profile\n\nMax risk / trade: 1%\nMax concurrent trades: 1\nTake-profit: 2× stop-loss\nStop-loss fraction of stake: 50%\n\nTap a field to change it."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Risk percent update confirms new profile",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "risk:configure" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "risk:set:percent" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Send max risk per trade as a percent (0.1–5). Example: 1\n\nTap Cancel to stop."
+            }
+          }
+        ]
+      },
+      {
+        "send": { "text": "2" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Modify max risk per trade or concurrent positions"
+              "text": "Updated. Max risk is 2% per trade."
             }
           }
-        ],
-        "send": {
-          "callback": "risk:configure"
-        }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Risk concurrent update confirms",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "risk:set:concurrent" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "3" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Updated. Max concurrent trades: 3."
+            }
+          }
+        ]
       }
     ]
   }
