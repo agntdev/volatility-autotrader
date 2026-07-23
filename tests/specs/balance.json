@@ -1,19 +1,69 @@
 [
   {
-    "name": "/balance",
+    "name": "/balance asks to accept terms when new",
     "steps": [
       {
+        "send": { "text": "/balance" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Display current account balance and risk parameters"
+              "text": "Accept the risk terms first — open /start and tap Accept terms."
             }
           }
-        ],
-        "send": {
-          "text": "/balance"
-        }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/balance asks for token after terms",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "/balance" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Link your Deriv API token first.\n\nOpen /start and finish setup, or tap Link token below."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Balance menu button after full onboard shows Deriv error without network",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "onboard:token" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "demoToken123456" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "balance:show" },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          { "method": "editMessageText" }
+        ]
       }
     ]
   }

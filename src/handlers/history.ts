@@ -1,15 +1,32 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { registerMainMenuItem } from "../toolkit/index.js";
+import { backMenu } from "../lib/ui.js";
+import { listTrades } from "../lib/domain.js";
+import { historyTable } from "../lib/trading.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
+registerMainMenuItem({ label: "History", data: "history:show", order: 40 });
 
-const composer = new Composer();
+const composer = new Composer<Ctx>();
+
+function uid(ctx: Ctx): string {
+  return String(ctx.from?.id ?? ctx.chat?.id ?? "0");
+}
+
+async function showHistory(ctx: Ctx, mode: "reply" | "edit"): Promise<void> {
+  const trades = await listTrades(uid(ctx), 10);
+  const text = historyTable(trades);
+  if (mode === "edit") await ctx.editMessageText(text, { reply_markup: backMenu() });
+  else await ctx.reply(text, { reply_markup: backMenu() });
+}
 
 composer.command("history", async (ctx) => {
-  await ctx.reply("Show last 10 executed trades with performance metrics");
+  await showHistory(ctx, "reply");
+});
+
+composer.callbackQuery("history:show", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  await showHistory(ctx, "edit");
 });
 
 export default composer;

@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Close unknown trade reports friendly error",
+    "steps": [
+      {
+        "send": { "callback": "trade:close:missing_id" },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Couldn't find that trade."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

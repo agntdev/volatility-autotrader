@@ -1,19 +1,54 @@
 [
   {
-    "name": "Pause AutoTrading",
+    "name": "Pause AutoTrading when already paused",
     "steps": [
       {
+        "send": { "callback": "autotrade:disable" },
         "expect": [
+          { "method": "answerCallbackQuery" },
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Suspend automated trading while retaining current positions"
+              "text": "AutoTrading is already paused."
             }
           }
-        ],
-        "send": {
-          "callback": "autotrade:disable"
-        }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Pause AutoTrading after enable retains positions message",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "onboard:token" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "pauseToken12345" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "autotrade:enable" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "autotrade:disable" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "AutoTrading paused. Open positions stay open — use History to manage them.\n\nTap Start AutoTrading when you want new entries again."
+            }
+          }
+        ]
       }
     ]
   }

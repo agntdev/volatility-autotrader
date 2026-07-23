@@ -1,17 +1,34 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { registerMainMenuItem } from "../toolkit/index.js";
+import { COPY, backMenu } from "../lib/ui.js";
+import { getOrCreateUser, setAutotradeEnabled } from "../lib/domain.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "Pause AutoTrading", data: "autotrade:disable" }) if the toolkit exposes it.
+registerMainMenuItem({
+  label: "Pause AutoTrading",
+  data: "autotrade:disable",
+  order: 20,
+});
 
-const composer = new Composer();
+const composer = new Composer<Ctx>();
+
+function uid(ctx: Ctx): string {
+  return String(ctx.from?.id ?? ctx.chat?.id ?? "0");
+}
 
 composer.callbackQuery("autotrade:disable", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Suspend automated trading while retaining current positions");
+  const user = await getOrCreateUser(uid(ctx));
+
+  if (!user.autotrade_enabled) {
+    await ctx.editMessageText(COPY.autotradeAlreadyOff, {
+      reply_markup: backMenu(),
+    });
+    return;
+  }
+
+  await setAutotradeEnabled(uid(ctx), false);
+  await ctx.editMessageText(COPY.autotradeOff, { reply_markup: backMenu() });
 });
 
 export default composer;

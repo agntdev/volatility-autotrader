@@ -1,12 +1,26 @@
 import { Composer } from "grammy";
 import { createBot, type BotContext, type CreateBotOptions } from "./toolkit/index.js";
 import type { StorageAdapter } from "grammy";
+import { resetStoreForTests } from "./lib/store.js";
 
-// The per-chat session shape (ephemeral conversation state only). Extend as the
-// bot grows. Durable domain data must NOT live here — use the toolkit's
-// persistent storage (see AGENTS.md).
+// The per-chat session shape (ephemeral conversation state only). Durable
+// domain data (users, trades, risk) lives in the toolkit-backed durable store.
+export type FlowStep =
+  | "idle"
+  | "awaiting_token"
+  | "awaiting_risk_percent"
+  | "awaiting_max_concurrent"
+  | "awaiting_tp_multiplier"
+  | "awaiting_owner_confidence"
+  | "awaiting_owner_min_balance";
+
 export interface Session {
-  // example: step?: "awaiting_amount";
+  step?: FlowStep;
+  riskDraft?: {
+    max_risk_percent?: number;
+    max_concurrent_trades?: number;
+    tp_multiplier?: number;
+  };
 }
 
 export type Ctx = BotContext<Session>;
@@ -43,8 +57,11 @@ export interface BuildBotOptions {
  * build-time manifest because Workers has no filesystem.
  */
 export async function buildBot(token: string, opts: BuildBotOptions = {}) {
+  // Isolate durable in-memory data between harness specs (no-op with Redis).
+  resetStoreForTests();
+
   const bot = createBot<Session>(token, {
-    initial: () => ({}),
+    initial: (): Session => ({ step: "idle" }),
     storage: opts.storage,
     telemetryEnv: opts.telemetryEnv,
     telemetryReporterOptions: opts.telemetryReporterOptions,

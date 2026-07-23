@@ -1,19 +1,75 @@
 [
   {
-    "name": "Start AutoTrading",
+    "name": "Start AutoTrading requires terms",
     "steps": [
       {
+        "send": { "callback": "autotrade:enable" },
         "expect": [
+          { "method": "answerCallbackQuery" },
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Activate pattern monitoring and automated trading"
+              "text": "Accept the risk terms first — open /start and tap Accept terms."
             }
           }
-        ],
-        "send": {
-          "callback": "autotrade:enable"
-        }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Start AutoTrading requires linked token",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "autotrade:enable" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Link your Deriv API token first.\n\nOpen /start and finish setup, or tap Link token below."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Start AutoTrading activates after full onboard",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "onboard:accept" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "onboard:token" },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "autoTradeToken99" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "autotrade:enable" },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "AutoTrading is on.\n\nI'll watch your instruments for head-and-shoulders and related patterns, size stakes from your risk profile, and notify you on every fill.\n\nTap Scan markets to run a check now.\n\nInstruments: Volatility 50, Volatility 75\nTimeframes: 1m, 5m\nConfidence ≥ 70%"
+            }
+          }
+        ]
       }
     ]
   }
