@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Adjust Risk Settings",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Modify max risk per trade or concurrent positions"
+            }
+          }
+        ],
+        "send": {
+          "callback": "risk:configure"
+        }
+      }
+    ]
+  }
+]
